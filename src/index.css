@@ -50,3 +50,13 @@ cite {
 .text-center {
   text-align: center;
 }
+
+.btn-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+button {
+  width: 45%;
+}
