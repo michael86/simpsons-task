@@ -11,7 +11,7 @@ class Meme extends Component {
     };
 
     return (
-      <div className="meme-container">
+      <div className={`meme-container ${liked ? "liked" : ""}`}>
         <div className="flex">
           {characterDirection === "Left" ? (
             <>

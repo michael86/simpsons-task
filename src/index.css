@@ -5,16 +5,16 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-align: center;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+input {
+  margin-top: 2rem;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr;
   align-items: center;
   gap: 20px;
   width: 95%;
@@ -33,6 +33,21 @@ code {
   flex-direction: column;
 }
 
+.meme-container.liked {
+  background-color: green;
+  color: #fff;
+}
+
+.meme-container.liked img {
+  transform: rotate(360deg);
+  transition: transform 0.5s ease-in-out;
+}
+
+.meme-container.liked p,
+.meme-container.liked cite {
+  animation: bounce 0.5s ease-in-out;
+}
+
 .flex {
   display: flex;
   align-items: center;
@@ -40,7 +55,7 @@ code {
 
 .grid img {
   width: 50%;
-  max-height: 300px;
+  max-height: 200px;
 }
 
 cite {
@@ -59,4 +74,35 @@ cite {
 
 button {
   width: 45%;
+}
+
+@keyframes bounce {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media screen and (min-width: 1800px) {
+  .grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
