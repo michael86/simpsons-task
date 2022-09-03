@@ -1,16 +1,14 @@
 import axios from "axios";
 import React, { Component } from "react";
+import "./App.css";
+import Header from "./components/Header";
 import Meme from "./components/Meme";
+import ShowLiked from "./components/ShowLiked";
 import simpsons from "./simpsons.json";
-import { findMemeById } from "./utils/utils";
+import { findMemeById, deleteFromArray } from "./utils/utils";
 
 class App extends Component {
-  constructor() {
-    super();
-    this.searchRef = React.createRef();
-  }
-
-  state = { searchInput: "", filtered: [] };
+  state = { filtered: [], liked: [], screen: 0 };
 
   async componentDidMount() {
     const data = await axios.get(
@@ -22,33 +20,31 @@ class App extends Component {
     });
 
     this.setState({ memes: data.data ? data.data : simpsons });
-
-    this.searchRef.current.focus();
   }
 
-  updateFiltered = (id) => {
-    return [...this.state.filtered].filter((meme) => meme.id !== id);
-  };
-
+  //Iterate over each state array and delete the relevant index
   onDelete = (id) => {
-    const copy = [...this.state.memes];
-
-    copy.splice(findMemeById(copy, id), 1);
-
-    this.setState({ memes: copy });
+    this.setState({ memes: deleteFromArray([...this.state.memes], id) });
 
     this.state.filtered.length > 0 &&
-      this.setState({ memes: this.updateFiltered(id) }); //This is broken
+      this.setState({
+        filtered: deleteFromArray([...this.state.filtered], id),
+      });
+
+    this.state.liked.length > 0 &&
+      this.setState(
+        { liked: deleteFromArray([...this.state.liked], id) },
+        () => {
+          //Wait for state to update before checking if we should go back to screen 0
+          this.state.liked.length === 0 &&
+            this.state.screen === 1 &&
+            this.setState({ screen: 0 });
+        }
+      );
   };
 
-  onLike = (id) => {
-    const memes = [...this.state.memes];
-    const index = findMemeById(memes, id);
-    memes[index].liked = !memes[index].liked;
-    this.setState({ memes });
-  };
-
-  countLikes = () => this.state.memes.filter((meme) => meme.liked).length;
+  //This is called from header when user input is detected
+  setFiltered = (filtered) => this.setState({ filtered });
 
   filterChars = (val) => {
     return [...this.state.memes].filter((meme) =>
@@ -56,43 +52,56 @@ class App extends Component {
     );
   };
 
-  onInput = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
+  //Triggered from Meme.jsx
+  onLike = (id) => {
+    //Was going to create a util to manage these two, but they both do different things, so nested functions it is.
+    const updateMemes = () => {
+      const memes = [...this.state.memes];
+      const index = findMemeById(memes, id);
+      memes[index].liked = !memes[index].liked;
+      this.setState({ memes });
+    };
 
-    console.log("length", e.target.value.length);
+    const updateLiked = () => {
+      const liked = [...this.state.liked];
+      liked.includes(id) ? liked.splice(liked.indexOf(id), 1) : liked.push(id);
+      this.setState({ liked });
+    };
 
-    e.target.value.length > 0 &&
-      this.setState({ filtered: this.filterChars(e.target.value) });
-
-    if (e.target.value.length === 0) {
-      console.log("clearing arr");
-      this.setState({ filtered: [] }); //This is also broken
-      console.log(this.state);
-    }
-
-    console.log("onInput", this.state.filtered);
+    updateMemes();
+    updateLiked();
   };
+
+  countLikes = () => this.state.memes.filter((meme) => meme.liked).length;
+
+  onShowLiked = () =>
+    this.setState({ screen: this.state.screen === 0 ? 1 : 0 });
 
   render() {
     if (!this.state.memes) {
       return (
-        <>
+        <div className="loading-container">
           <h1>Loading....</h1>
-        </>
+          <img
+            src={require("./imgs/spinner.png")}
+            className="loading-image"
+            alt="Loading spinner"
+          />
+        </div>
       );
     }
 
     const data =
       this.state.filtered.length > 0 ? this.state.filtered : this.state.memes;
 
-    return (
+    return this.state.screen === 0 ? (
       <>
-        <input
-          type="text"
-          name="searchInput"
-          value={this.state.searchInput}
-          onInput={this.onInput}
-          ref={this.searchRef}
+        <Header
+          liked={this.state.liked}
+          filterChars={this.filterChars}
+          setFiltered={this.setFiltered}
+          screen={this.state.screen}
+          onShowLiked={this.onShowLiked}
         />
 
         <h1>likes: {this.countLikes()}</h1>
@@ -106,6 +115,24 @@ class App extends Component {
                 onDelete={this.onDelete}
                 onLike={this.onLike}
               />
+            );
+          })}
+        </div>
+      </>
+    ) : (
+      <>
+        <ShowLiked onShowLiked={this.onShowLiked} screen={this.state.screen} />
+        <div className="grid">
+          {data.map((d) => {
+            return (
+              d.liked && (
+                <Meme
+                  key={d.id}
+                  quote={d}
+                  onDelete={this.onDelete}
+                  onLike={this.onLike}
+                />
+              )
             );
           })}
         </div>
