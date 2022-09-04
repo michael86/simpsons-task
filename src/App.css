@@ -13,6 +13,23 @@ body {
   text-align: center;
 }
 
+header {
+  width: 80%;
+  margin: auto;
+}
+
+header > * {
+  width: 70%;
+}
+
+header > input {
+  margin-top: 2rem;
+}
+
+main button {
+  width: 45%;
+}
+
 .loading-contaner {
   width: 80%;
   margin: auto;
@@ -24,14 +41,7 @@ body {
   height: 250px;
   animation: rotate 1s infinite;
 }
-@keyframes rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
+
 .flex {
   display: flex;
   align-items: center;
@@ -39,10 +49,6 @@ body {
 
 .flex-col {
   flex-direction: column;
-}
-
-input {
-  margin-top: 2rem;
 }
 
 .toggle-likes {
@@ -104,8 +110,13 @@ cite {
   padding: 10px;
 }
 
-button {
-  width: 45%;
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes bounce {

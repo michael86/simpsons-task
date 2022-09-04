@@ -23,7 +23,7 @@ class Header extends Component {
   render() {
     return (
       <>
-        <div className="flex flex-col">
+        <header className="flex flex-col">
           <input
             type="text"
             name="searchInput"
@@ -38,7 +38,7 @@ class Header extends Component {
               screen={this.props.screen}
             />
           )}
-        </div>
+        </header>
       </>
     );
   }
